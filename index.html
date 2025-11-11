@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Taste of Choice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', 'Quicksand', 'Comfortaa', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(180deg, #1a1f3a 0%, #2d1b4e 100%);
+            color: #fff;
+            height: 100vh;
+        }
+
+        section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-in-out;
+        }
+
+        section.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* INTRO SCENE */
+        #intro {
+            background: linear-gradient(180deg, #2d1b4e 0%, #4a2c5e 50%, #ff6b35 100%);
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            color: white;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        /* CUSTOMER SCENE */
+        #customers {
+            background: linear-gradient(180deg, #1a1f3a 0%, #3d2f52 100%);
+            padding: 2rem;
+            transition: background 0.8s ease;
+        }
+
+        .customer-container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .dialogue-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            min-height: 180px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .dialogue-text {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .round-title {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        .choices {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            min-width: 250px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            transform: translateY(-2px);
+        }
+
+        .reaction-text {
+            font-size: 1.3rem;
+            font-style: italic;
+            color: #ffd700;
+            margin-top: 1.5rem;
+            min-height: 40px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* OUTCOME SCENE */
+        #outcome {
+            background: linear-gradient(180deg, #2d1b4e 0%, #1a1f3a 50%, #ff6b35 100%);
+            text-align: center;
+        }
+
+        .outcome-content {
+            max-width: 700px;
+        }
+
+        .outcome-text {
+            font-size: 1.8rem;
+            line-height: 2;
+            margin-bottom: 1rem;
+        }
+
+        .taco-illustration {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            background: radial-gradient(circle, #ffd700 0%, #ff6b35 50%, transparent 70%);
+            border-radius: 50%;
+            animation: glow 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
+
+        /* TYPING EFFECT */
+        .typing::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* FADE TRANSITIONS */
+        .fade-out {
+            opacity: 0 !important;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .subtitle { font-size: 1.2rem; }
+            .dialogue-text { font-size: 1.1rem; }
+            .choices { flex-direction: column; }
+            .choice-btn { min-width: 200px; }
+        }
+
+        /* BACKGROUND MOOD CLASSES */
+        .bg-warm {
+            background: linear-gradient(180deg, #3d2f52 0%, #5a3d6b 100%) !important;
+        }
+
+        .bg-hopeful {
+            background: linear-gradient(180deg, #2d4a5e 0%, #4a6b7c 100%) !important;
+        }
+
+        .bg-energetic {
+            background: linear-gradient(180deg, #4a2c2c 0%, #6b3d3d 100%) !important;
+        }
+
+        .bg-creative {
+            background: linear-gradient(180deg, #3d2f52 0%, #5a4d6b 100%) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- INTRO SCENE -->
+    <section id="intro" class="active">
+        <h1 class="title">The Taste of Choice</h1>
+        <p class="subtitle">Every flavor tells a story.</p>
+        <button id="startBtn">Start Your Taco Stand</button>
+    </section>
+
+    <!-- CUSTOMER SCENE -->
+    <section id="customers">
+        <div class="customer-container">
+            <div class="dialogue-box">
+                <p class="dialogue-text" id="dialogueText"></p>
+                <p class="round-title" id="roundTitle"></p>
+                <p class="reaction-text" id="reactionText"></p>
+            </div>
+            <div class="choices" id="choicesContainer"></div>
+        </div>
+    </section>
+
+    <!-- OUTCOME SCENE -->
+    <section id="outcome">
+        <div class="outcome-content">
+            <p class="outcome-text">You've served three different souls tonight.</p>
+            <p class="outcome-text">Every choice changed a mood.</p>
+            <p class="outcome-text">Every flavor told a story.</p>
+            <div class="taco-illustration">🌮</div>
+            <button id="restartBtn">Restart the Night</button>
+        </div>
+    </section>
+
+    <!-- AUDIO -->
+    <audio id="ambientSound" loop>
+        <source src="ambient-market.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="click.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // GAME DATA
+        const customers = [
+            {
+                name: "The Overworked Office Worker",
+                intro: "A tired man in a suit walks up to your stand.\nHe says: \"It's been a long day… maybe food will help me breathe again.\"",
+                rounds: [
+                    {
+                        title: "Communication Style",
+                        choices: [
+                            { text: "Warm welcome", reaction: "Thanks… feels nice to be noticed after a long day." },
+                            { text: "Respectful distance", reaction: "I appreciate the quiet. No small talk for once." },
+                            { text: "Light humor", reaction: "Haha, didn't expect to laugh tonight." }
+                        ]
+                    },
+                    {
+                        title: "Ingredients",
+                        choices: [
+                            { text: "Traditional taco (soft beef & onion)", reaction: "This is comfort. Like home after overtime." },
+                            { text: "Spicy taco (extra chili)", reaction: "Whoa! That actually woke me up." },
+                            { text: "Experimental taco (fusion with pineapple)", reaction: "Pineapple? That's… surprisingly good." }
+                        ]
+                    },
+                    {
+                        title: "Presentation",
+                        choices: [
+                            { text: "Handmade plate", reaction: "You even plated it nicely. That's care." },
+                            { text: "Paper wrap", reaction: "Perfect. I'll eat this while heading back." },
+                            { text: "Bright colored garnish", reaction: "Didn't expect street food to look this cheerful." }
+                        ]
+                    }
+                ],
+                mood: "bg-warm"
+            },
+            {
+                name: "The Immigrant Woman",
+                intro: "A woman carrying a small suitcase stops by.\nShe says: \"Your food smells familiar… but the city feels so new.\"",
+                rounds: [
+                    {
+                        title: "Communication Style",
+                        choices: [
+                            { text: "Warm welcome", reaction: "You make me feel like I belong here." },
+                            { text: "Respectful distance", reaction: "Polite and kind — like a safe harbor." },
+                            { text: "Light humor", reaction: "Haha, maybe laughter sounds the same in every language." }
+                        ]
+                    },
+                    {
+                        title: "Ingredients",
+                        choices: [
+                            { text: "Traditional taco (soft beef & onion)", reaction: "This taste… it brings back memories of home." },
+                            { text: "Spicy taco (extra chili)", reaction: "Strong and fiery — like starting a new life." },
+                            { text: "Experimental taco (fusion with pineapple)", reaction: "It's like two places meeting in one bite." }
+                        ]
+                    },
+                    {
+                        title: "Presentation",
+                        choices: [
+                            { text: "Handmade plate", reaction: "It feels personal — like something made for me." },
+                            { text: "Paper wrap", reaction: "I'll take it on my walk — my journey continues." },
+                            { text: "Bright colored garnish", reaction: "So vibrant… like the markets I miss." }
+                        ]
+                    }
+                ],
+                mood: "bg-hopeful"
+            },
+            {
+                name: "The Art Student",
+                intro: "A quiet young artist with paint on her hands appears.\nShe says: \"I'm searching for inspiration… maybe flavor can spark it.\"",
+                rounds: [
+                    {
+                        title: "Communication Style",
+                        choices: [
+                            { text: "Warm welcome", reaction: "Your energy feels… like a sunrise after an all-nighter." },
+                            { text: "Respectful distance", reaction: "I like how you give space. Inspiration needs silence." },
+                            { text: "Light humor", reaction: "Haha, you're playful — that's rare in serious artists." }
+                        ]
+                    },
+                    {
+                        title: "Ingredients",
+                        choices: [
+                            { text: "Traditional taco (soft beef & onion)", reaction: "Simple. Honest. Like a clean canvas." },
+                            { text: "Spicy taco (extra chili)", reaction: "Bold! That's passion in edible form." },
+                            { text: "Experimental taco (fusion with pineapple)", reaction: "Fusion… chaos… I love it." }
+                        ]
+                    },
+                    {
+                        title: "Presentation",
+                        choices: [
+                            { text: "Handmade plate", reaction: "It's like edible art." },
+                            { text: "Paper wrap", reaction: "Casual, fleeting — like street sketches." },
+                            { text: "Bright colored garnish", reaction: "Color! You understand aesthetics!" }
+                        ]
+                    }
+                ],
+                mood: "bg-creative"
+            }
+        ];
+
+        // GAME STATE
+        let currentCustomerIndex = 0;
+        let currentRound = 0;
+
+        // ELEMENTS
+        const introSection = document.getElementById('intro');
+        const customersSection = document.getElementById('customers');
+        const outcomeSection = document.getElementById('outcome');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const dialogueText = document.getElementById('dialogueText');
+        const roundTitle = document.getElementById('roundTitle');
+        const reactionText = document.getElementById('reactionText');
+        const choicesContainer = document.getElementById('choicesContainer');
+        const ambientSound = document.getElementById('ambientSound');
+        const clickSound = document.getElementById('clickSound');
+
+        // UTILITY FUNCTIONS
+        function playSound(sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Audio play failed:', e));
+        }
+
+        function switchScene(from, to) {
+            from.classList.remove('active');
+            from.classList.add('fade-out');
+            setTimeout(() => {
+                from.classList.remove('fade-out');
+                to.classList.add('active');
+            }, 500);
+        }
+
+        function typeText(element, text, speed = 30) {
+            element.textContent = '';
+            element.classList.add('typing');
+            let i = 0;
+
+            const type = () => {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.classList.remove('typing');
+                }
+            };
+
+            type();
+        }
+
+        function showCustomer(customerIndex) {
+            const customer = customers[customerIndex];
+            currentRound = 0;
+
+            // Apply mood background
+            customersSection.className = '';
+            customersSection.classList.add(customer.mood);
+
+            // Show intro dialogue
+            typeText(dialogueText, customer.intro);
+            roundTitle.textContent = '';
+            reactionText.textContent = '';
+            choicesContainer.innerHTML = '';
+
+            // Show first round after typing
+            setTimeout(() => {
+                showRound(customerIndex, 0);
+            }, customer.intro.length * 30 + 1000);
+        }
+
+        function showRound(customerIndex, roundIndex) {
+            const customer = customers[customerIndex];
+            const round = customer.rounds[roundIndex];
+
+            roundTitle.textContent = `— ${round.title} —`;
+            reactionText.textContent = '';
+            choicesContainer.innerHTML = '';
+
+            // Create choice buttons
+            round.choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = () => handleChoice(customerIndex, roundIndex, index);
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        function handleChoice(customerIndex, roundIndex, choiceIndex) {
+            playSound(clickSound);
+
+            const customer = customers[customerIndex];
+            const round = customer.rounds[roundIndex];
+            const choice = round.choices[choiceIndex];
+
+            // Show reaction
+            reactionText.textContent = `"${choice.reaction}"`;
+
+            // Hide choices temporarily
+            choicesContainer.style.opacity = '0';
+
+            // Move to next round or customer
+            setTimeout(() => {
+                if (roundIndex < customer.rounds.length - 1) {
+                    // Next round
+                    choicesContainer.style.opacity = '1';
+                    showRound(customerIndex, roundIndex + 1);
+                } else if (customerIndex < customers.length - 1) {
+                    // Next customer
+                    choicesContainer.style.opacity = '1';
+                    currentCustomerIndex++;
+                    showCustomer(currentCustomerIndex);
+                } else {
+                    // End game
+                    switchScene(customersSection, outcomeSection);
+                }
+            }, 2500);
+        }
+
+        function resetGame() {
+            currentCustomerIndex = 0;
+            currentRound = 0;
+            switchScene(outcomeSection, introSection);
+        }
+
+        // EVENT LISTENERS
+        startBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            playSound(ambientSound);
+            switchScene(introSection, customersSection);
+            setTimeout(() => {
+                showCustomer(0);
+            }, 600);
+        });
+
+        restartBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            resetGame();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Preload sounds
+            ambientSound.volume = 0.3;
+            clickSound.volume = 0.5;
+        });
+    </script>
+</body>
+</html>
