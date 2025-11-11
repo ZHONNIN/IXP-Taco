@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Taste of Choice</title>
+  <style>
+    /* ==================== RESET & BASE ==================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 450ms ease, color 300ms ease;
+      line-height: 1.6;
+    }
+
+    /* ==================== CSS VARIABLES / TONES ==================== */
+    :root {
+      --bg: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      --bg-2: #16213e;
+      --text: #f0e6d2;
+      --accent: #ff6b35;
+      --glow: rgba(255, 107, 53, 0.3);
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    body[data-tone="warm"] {
+      --bg: linear-gradient(135deg, #2d1b1f 0%, #4a2c2a 100%);
+      --bg-2: #3d2522;
+      --accent: #ff8c42;
+      --glow: rgba(255, 140, 66, 0.35);
+    }
+
+    body[data-tone="calm"] {
+      --bg: linear-gradient(135deg, #1a2332 0%, #0d1b2a 100%);
+      --bg-2: #1b263b;
+      --accent: #d4a574;
+      --glow: rgba(212, 165, 116, 0.3);
+    }
+
+    body[data-tone="playful"] {
+      --bg: linear-gradient(135deg, #2d1b3d 0%, #4a1a4a 100%);
+      --bg-2: #3a1f4a;
+      --accent: #e879f9;
+      --glow: rgba(232, 121, 249, 0.35);
+    }
+
+    body[data-tone="comfort"] {
+      --bg: linear-gradient(135deg, #3d2817 0%, #5c3a1f 100%);
+      --bg-2: #4d3320;
+      --accent: #ffb347;
+      --glow: rgba(255, 179, 71, 0.4);
+    }
+
+    body[data-tone="spicy"] {
+      --bg: linear-gradient(135deg, #3d1a1a 0%, #5c2020 100%);
+      --bg-2: #4a1f1f;
+      --accent: #ff5733;
+      --glow: rgba(255, 87, 51, 0.45);
+    }
+
+    body[data-tone="experimental"] {
+      --bg: linear-gradient(135deg, #1a3d3d 0%, #204a5c 100%);
+      --bg-2: #1f4a4a;
+      --accent: #ff00ff;
+      --glow: rgba(0, 255, 255, 0.35);
+    }
+
+    body[data-tone="crafted"] {
+      --bg: linear-gradient(135deg, #3d2f1a 0%, #5c4a20 100%);
+      --bg-2: #4d3f20;
+      --accent: #e07a5f;
+      --glow: rgba(224, 122, 95, 0.35);
+    }
+
+    body[data-tone="onthego"] {
+      --bg: linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 100%);
+      --bg-2: #333333;
+      --accent: #94a3b8;
+      --glow: rgba(148, 163, 184, 0.3);
+    }
+
+    body[data-tone="vibrant"] {
+      --bg: linear-gradient(135deg, #1a1a3d 0%, #2a2a5c 100%);
+      --bg-2: #252550;
+      --accent: #fbbf24;
+      --glow: rgba(251, 191, 36, 0.4);
+    }
+
+    /* ==================== REDUCED MOTION ==================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ==================== CONTAINER ==================== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ==================== SCENES ==================== */
+    .scene {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity 600ms ease, transform 600ms ease;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .scene.is-active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .scene {
+        transform: none;
+        transition: opacity 50ms ease;
+      }
+    }
+
+    /* ==================== INTRO SCENE ==================== */
+    .intro {
+      text-align: center;
+    }
+
+    .intro__title {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      text-shadow: 0 0 30px var(--glow);
+      letter-spacing: -1px;
+    }
+
+    .intro__subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 3rem;
+      opacity: 0.9;
+      font-style: italic;
+    }
+
+    /* ==================== BUTTONS ==================== */
+    .btn {
+      background: var(--accent);
+      color: #0f0f0f;
+      border: none;
+      padding: 1.25rem 3rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px var(--shadow), 0 0 20px var(--glow);
+      transition: all 300ms ease;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 12px 32px var(--shadow), 0 0 30px var(--glow);
+    }
+
+    .btn:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ==================== CUSTOMER SCENE ==================== */
+    .customer {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .customer__header {
+      text-align: center;
+      font-size: 0.95rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .customer__card {
+      background: var(--bg-2);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 32px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .customer__avatar {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      box-shadow: 0 4px 16px var(--glow);
+    }
+
+    .customer__name {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .customer__dialogue {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      min-height: 100px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 200ms ease;
+    }
+
+    .customer__dialogue:hover {
+      border-color: var(--accent);
+    }
+
+    .customer__prompt {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .customer__choices {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .choice {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: var(--text);
+      padding: 1.25rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 250ms ease;
+      text-align: left;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .choice:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+      border-color: var(--accent);
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px var(--shadow), 0 0 15px var(--glow);
+    }
+
+    .choice:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .customer__reaction {
+      background: rgba(0, 0, 0, 0.4);
+      border-left: 4px solid var(--accent);
+      padding: 1.25rem;
+      border-radius: 8px;
+      font-style: italic;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 400ms ease, transform 400ms ease;
+      margin-top: 1rem;
+    }
+
+    .customer__reaction.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .customer__next {
+      margin-top: 1.5rem;
+      align-self: center;
+    }
+
+    /* ==================== OUTCOME SCENE ==================== */
+    .outcome {
+      text-align: center;
+    }
+
+    .outcome__title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--accent);
+    }
+
+    .outcome__summary {
+      font-size: 1.25rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .outcome__icon {
+      width: 120px;
+      height: 120px;
+      margin: 2rem auto;
+      fill: var(--accent);
+      filter: drop-shadow(0 0 20px var(--glow));
+    }
+
+    .outcome__log {
+      background: var(--bg-2);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: left;
+      box-shadow: 0 8px 32px var(--shadow);
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .outcome__customer {
+      margin-bottom: 2rem;
+    }
+
+    .outcome__customer:last-child {
+      margin-bottom: 0;
+    }
+
+    .outcome__customer-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .outcome__choice {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      gap: 1rem;
+    }
+
+    .outcome__choice:last-child {
+      border-bottom: none;
+    }
+
+    .outcome__choice-round {
+      font-weight: 600;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .outcome__choice-label {
+      flex: 1;
+    }
+
+    /* ==================== UTILITY ==================== */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- INTRO SCENE -->
+    <section class="scene intro" id="intro" role="region" aria-label="Introduction">
+      <h1 class="intro__title">The Taste of Choice</h1>
+      <p class="intro__subtitle">Every flavor tells a story.</p>
+      <button class="btn" id="startBtn" aria-label="Start your taco stand">
+        Start Your Taco Stand
+      </button>
+    </section>
+
+    <!-- CUSTOMER SCENE -->
+    <section class="scene customer" id="customer" role="region" aria-label="Customer interaction">
+      <div class="customer__header" id="customerHeader" aria-live="polite"></div>
+      <div class="customer__card">
+        <div class="customer__avatar" id="customerAvatar" aria-hidden="true">🌮</div>
+        <h2 class="customer__name" id="customerName"></h2>
+        <div
+          class="customer__dialogue"
+          id="customerDialogue"
+          role="button"
+          tabindex="0"
+          aria-label="Customer dialogue - click to skip typing"
+        ></div>
+        <div id="choiceSection" style="display: none;">
+          <p class="customer__prompt" id="choicePrompt"></p>
+          <div class="customer__choices" id="choicesContainer" role="group"></div>
+          <div class="customer__reaction" id="reactionText"></div>
+          <button class="btn customer__next" id="nextBtn" style="display: none;">
+            Continue
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTCOME SCENE -->
+    <section class="scene outcome" id="outcome" role="region" aria-label="Night summary">
+      <h1 class="outcome__title">The Night Ends</h1>
+      <div class="outcome__summary">
+        <p>You've served 3 customers tonight.</p>
+        <p>Every choice changed someone's mood.</p>
+        <p>Every flavor left a story behind.</p>
+      </div>
+      <svg class="outcome__icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <ellipse cx="50" cy="70" rx="35" ry="15" fill="currentColor" opacity="0.3"/>
+        <path d="M 20 60 Q 30 40, 50 45 Q 70 40, 80 60 L 75 65 Q 65 50, 50 52 Q 35 50, 25 65 Z" fill="currentColor"/>
+        <circle cx="40" cy="50" r="3" fill="#0f0f0f"/>
+        <circle cx="60" cy="50" r="3" fill="#0f0f0f"/>
+        <path d="M 35 57 Q 50 62, 65 57" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+      <div class="outcome__log" id="outcomeLog" role="list"></div>
+      <button class="btn" id="restartBtn">Restart the Night</button>
+    </section>
+  </div>
+
+  <script>
+    /* ==================== DATA ==================== */
+    const CUSTOMERS = [
+      {
+        id: "office-worker",
+        name: "The Overworked Office Worker",
+        intro: "A tired man in a suit walks up to your stand. He says: "It's been a long day… I just need something simple to keep me going."",
+        rounds: [
+          {
+            type: "communication",
+            title: "Communication Style",
+            choices: [
+              { key: "warm", label: "Warm welcome",
+                reaction: "Thanks… I haven't heard a kind voice all day."
+              },
+              { key: "calm", label: "Respectful distance",
+                reaction: "Quiet is good. My head's still buzzing."
+              },
+              { key: "playful", label: "Light humor",
+                reaction: "Ha— okay, you made me smile."
+              }
+            ]
+          },
+          {
+            type: "ingredients",
+            title: "Ingredients",
+            choices: [
+              { key: "comfort", label: "Traditional taco (soft beef & onion)",
+                reaction: "This is steady fuel. I can keep going."
+              },
+              { key: "spicy", label: "Spicy taco (extra chili)",
+                reaction: "Whoo— that kick cleared the fog!"
+              },
+              { key: "experimental", label: "Experimental taco (fusion with pineapple)",
+                reaction: "Didn't expect sweet— weirdly refreshing."
+              }
+            ]
+          },
+          {
+            type: "presentation",
+            title: "Presentation",
+            choices: [
+              { key: "crafted", label: "Handmade plate",
+                reaction: "Feels cared for. I'll eat right here."
+              },
+              { key: "onthego", label: "Paper wrap",
+                reaction: "Perfect. I need to move."
+              },
+              { key: "vibrant", label: "Bright colored garnish",
+                reaction: "Small brightness after a long day."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "immigrant-woman",
+        name: "The Immigrant Woman",
+        intro: "A woman carrying a small suitcase stops by. She says: "Your food smells familiar… but also different. I just arrived in this city."",
+        rounds: [
+          {
+            type: "communication",
+            title: "Communication Style",
+            choices: [
+              { key: "warm", label: "Warm welcome",
+                reaction: "You make me feel like I belong."
+              },
+              { key: "calm", label: "Respectful distance",
+                reaction: "Thank you for the space. I'm still taking it in."
+              },
+              { key: "playful", label: "Light humor",
+                reaction: "Laughter sounds the same everywhere."
+              }
+            ]
+          },
+          {
+            type: "ingredients",
+            title: "Ingredients",
+            choices: [
+              { key: "comfort", label: "Traditional taco (soft beef & onion)",
+                reaction: "This tastes like home. I missed this."
+              },
+              { key: "spicy", label: "Spicy taco (extra chili)",
+                reaction: "Strong and alive— like starting over."
+              },
+              { key: "experimental", label: "Experimental taco (fusion with pineapple)",
+                reaction: "Two places meeting in one bite."
+              }
+            ]
+          },
+          {
+            type: "presentation",
+            title: "Presentation",
+            choices: [
+              { key: "crafted", label: "Handmade plate",
+                reaction: "Made with hands, made with heart."
+              },
+              { key: "onthego", label: "Paper wrap",
+                reaction: "I'll eat as I walk, like a journey."
+              },
+              { key: "vibrant", label: "Bright colored garnish",
+                reaction: "Colors I know, streets I miss."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "art-student",
+        name: "The Art Student",
+        intro: "A quiet young artist with paint on her hands appears. She says: "I'm searching for inspiration… maybe flavor can spark it."",
+        rounds: [
+          {
+            type: "communication",
+            title: "Communication Style",
+            choices: [
+              { key: "warm", label: "Warm welcome",
+                reaction: "Your energy is gentle. Safe."
+              },
+              { key: "calm", label: "Respectful distance",
+                reaction: "Hmm. Space helps ideas breathe."
+              },
+              { key: "playful", label: "Light humor",
+                reaction: "Haha— that loosened my mind."
+              }
+            ]
+          },
+          {
+            type: "ingredients",
+            title: "Ingredients",
+            choices: [
+              { key: "comfort", label: "Traditional taco (soft beef & onion)",
+                reaction: "Simple forms— a good baseline."
+              },
+              { key: "spicy", label: "Spicy taco (extra chili)",
+                reaction: "Contrast! Heat creates movement."
+              },
+              { key: "experimental", label: "Experimental taco (fusion with pineapple)",
+                reaction: "Juxtaposition— sweet vs. savory sparks."
+              }
+            ]
+          },
+          {
+            type: "presentation",
+            title: "Presentation",
+            choices: [
+              { key: "crafted", label: "Handmade plate",
+                reaction: "Tactile surface— love the material."
+              },
+              { key: "onthego", label: "Paper wrap",
+                reaction: "Portable sketch— I'll eat on the way to studio."
+              },
+              { key: "vibrant", label: "Bright colored garnish",
+                reaction: "Color pop! Composition feels alive."
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ==================== AUDIO SYSTEM ==================== */
+    const SFX = {
+      ambient: 'ambient-night.mp3',
+      select: 'ui-select.mp3'
+    };
+
+    let audioContext = null;
+    let ambientAudio = null;
+
+    function initAudio() {
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        // Create ambient audio element
+        ambientAudio = new Audio(SFX.ambient);
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.3;
+        ambientAudio.play().catch(() => {
+          // Fallback if audio fails silently
+        });
+      } catch (e) {
+        // Audio not supported, continue silently
+      }
+    }
+
+    function playSound(name) {
+      try {
+        const audio = new Audio(SFX[name]);
+        audio.volume = 0.5;
+        audio.play().catch(() => {
+          // Fail silently if audio doesn't exist
+        });
+      } catch (e) {
+        // Fail silently
+      }
+    }
+
+    /* ==================== STATE ==================== */
+    let customerIndex = 0;
+    let roundIndex = 0;
+    let choicesLog = [];
+    let isTyping = false;
+    let typeSkipped = false;
+
+    /* ==================== TONE SYSTEM ==================== */
+    function applyTone(choiceKey) {
+      document.body.setAttribute('data-tone', choiceKey);
+    }
+
+    /* ==================== TYPING EFFECT ==================== */
+    function typeDialogue(element, text, callback) {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const speed = reducedMotion ? 5 : 30;
+
+      let index = 0;
+      element.textContent = '';
+      isTyping = true;
+      typeSkipped = false;
+
+      function type() {
+        if (typeSkipped) {
+          element.textContent = text;
+          isTyping = false;
+          if (callback) callback();
+          return;
+        }
+
+        if (index < text.length) {
+          element.textContent += text.charAt(index);
+          index++;
+          setTimeout(type, speed);
+        } else {
+          isTyping = false;
+          if (callback) callback();
+        }
+      }
+
+      type();
+    }
+
+    /* ==================== SCENE NAVIGATION ==================== */
+    function showScene(sceneId) {
+      document.querySelectorAll('.scene').forEach(s => s.classList.remove('is-active'));
+      setTimeout(() => {
+        document.getElementById(sceneId).classList.add('is-active');
+      }, 100);
+    }
+
+    /* ==================== INTRO SCENE ==================== */
+    function renderIntro() {
+      showScene('intro');
+    }
+
+    /* ==================== CUSTOMER SCENE ==================== */
+    function renderCustomer() {
+      showScene('customer');
+
+      const customer = CUSTOMERS[customerIndex];
+      const round = customer.rounds[roundIndex];
+
+      // Update header
+      document.getElementById('customerHeader').textContent =
+        `Customer ${customerIndex + 1} of 3 · Round ${roundIndex + 1} of 3`;
+
+      // Update name
+      document.getElementById('customerName').textContent = customer.name;
+
+      // Update dialogue with typing effect
+      const dialogueEl = document.getElementById('customerDialogue');
+      const text = roundIndex === 0 ? customer.intro : '';
+
+      document.getElementById('choiceSection').style.display = 'none';
+      document.getElementById('reactionText').classList.remove('is-visible');
+      document.getElementById('reactionText').textContent = '';
+      document.getElementById('nextBtn').style.display = 'none';
+
+      if (text) {
+        typeDialogue(dialogueEl, text, () => {
+          setTimeout(showChoices, 300);
+        });
+      } else {
+        dialogueEl.textContent = `"${round.title}"`;
+        showChoices();
+      }
+    }
+
+    function showChoices() {
+      const customer = CUSTOMERS[customerIndex];
+      const round = customer.rounds[roundIndex];
+
+      document.getElementById('choiceSection').style.display = 'block';
+      document.getElementById('choicePrompt').textContent = round.title;
+
+      const container = document.getElementById('choicesContainer');
+      container.innerHTML = '';
+
+      round.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice.label;
+        btn.setAttribute('aria-label', `Choice: ${choice.label}`);
+        btn.addEventListener('click', () => handleChoice(choice));
+        container.appendChild(btn);
+      });
+
+      // Focus first choice
+      container.querySelector('.choice')?.focus();
+    }
+
+    function handleChoice(choice) {
+      playSound('select');
+
+      // Log the choice
+      choicesLog.push({
+        customerId: CUSTOMERS[customerIndex].id,
+        customerName: CUSTOMERS[customerIndex].name,
+        round: roundIndex + 1,
+        roundType: CUSTOMERS[customerIndex].rounds[roundIndex].type,
+        choiceKey: choice.key,
+        choiceLabel: choice.label
+      });
+
+      // Apply tone
+      applyTone(choice.key);
+
+      // Hide choices
+      document.getElementById('choicesContainer').innerHTML = '';
+      document.getElementById('choicePrompt').textContent = '';
+
+      // Show reaction
+      const reactionEl = document.getElementById('reactionText');
+      reactionEl.textContent = `"${choice.reaction}"`;
+      setTimeout(() => {
+        reactionEl.classList.add('is-visible');
+
+        // Show next button
+        setTimeout(() => {
+          const nextBtn = document.getElementById('nextBtn');
+          nextBtn.style.display = 'inline-block';
+          nextBtn.focus();
+        }, 600);
+      }, 100);
+    }
+
+    function advanceRound() {
+      roundIndex++;
+
+      if (roundIndex >= 3) {
+        // Move to next customer
+        customerIndex++;
+        roundIndex = 0;
+
+        if (customerIndex >= 3) {
+          // All customers done, show outcome
+          renderOutcome();
+        } else {
+          renderCustomer();
+        }
+      } else {
+        renderCustomer();
+      }
+    }
+
+    /* ==================== OUTCOME SCENE ==================== */
+    function renderOutcome() {
+      showScene('outcome');
+
+      const logEl = document.getElementById('outcomeLog');
+      logEl.innerHTML = '';
+
+      // Group by customer
+      const grouped = {};
+      choicesLog.forEach(choice => {
+        if (!grouped[choice.customerId]) {
+          grouped[choice.customerId] = {
+            name: choice.customerName,
+            choices: []
+          };
+        }
+        grouped[choice.customerId].choices.push(choice);
+      });
+
+      Object.values(grouped).forEach(customer => {
+        const customerDiv = document.createElement('div');
+        customerDiv.className = 'outcome__customer';
+        customerDiv.setAttribute('role', 'listitem');
+
+        const nameEl = document.createElement('h3');
+        nameEl.className = 'outcome__customer-name';
+        nameEl.textContent = customer.name;
+        customerDiv.appendChild(nameEl);
+
+        customer.choices.forEach(choice => {
+          const choiceDiv = document.createElement('div');
+          choiceDiv.className = 'outcome__choice';
+
+          const roundEl = document.createElement('span');
+          roundEl.className = 'outcome__choice-round';
+          roundEl.textContent = `Round ${choice.round}:`;
+
+          const labelEl = document.createElement('span');
+          labelEl.className = 'outcome__choice-label';
+          labelEl.textContent = choice.choiceLabel;
+
+          choiceDiv.appendChild(roundEl);
+          choiceDiv.appendChild(labelEl);
+          customerDiv.appendChild(choiceDiv);
+        });
+
+        logEl.appendChild(customerDiv);
+      });
+    }
+
+    /* ==================== RESTART ==================== */
+    function restart() {
+      customerIndex = 0;
+      roundIndex = 0;
+      choicesLog = [];
+      document.body.removeAttribute('data-tone');
+      renderIntro();
+    }
+
+    /* ==================== EVENT LISTENERS ==================== */
+    document.getElementById('startBtn').addEventListener('click', () => {
+      initAudio();
+      renderCustomer();
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', advanceRound);
+
+    document.getElementById('restartBtn').addEventListener('click', restart);
+
+    // Skip typing on click
+    document.getElementById('customerDialogue').addEventListener('click', () => {
+      if (isTyping) {
+        typeSkipped = true;
+      }
+    });
+
+    // Keyboard support for dialogue skip
+    document.getElementById('customerDialogue').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && isTyping) {
+        typeSkipped = true;
+      }
+    });
+
+    /* ==================== INIT ==================== */
+    renderIntro();
+  </script>
+</body>
+</html>
